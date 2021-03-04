@@ -13,7 +13,11 @@ class Edge:
         return self._label
 
     def vertices(self):
-        pass
+        return (self._v1, self._v2)
 
     def opposite(self, vertex):
-        pass
+        if vertex == self._v1:
+            return self._v2
+        elif vertex == self._v2:
+            return self._v1
+        return None

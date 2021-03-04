@@ -7,5 +7,6 @@ class Vertex:
     def __str__(self):
         return str(self._label)
 
-    def element(self):
+    @property
+    def label(self):
         return self._label
