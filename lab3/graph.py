@@ -6,7 +6,7 @@ class Vertex:
 
     def __init__(self, element):
         """Initialise a new vertex.
-        
+
         Args:
             element (any): The label associated with the vertex.
         """
@@ -79,7 +79,7 @@ class Graph:
     def __init__(self):
         """Initialise a new graph."""
         self._adj_map = {}
-    
+
     def __str__(self):
         """Return a string representation of the graph."""
         summary = "|V| = {}; |E| = {}".format(
@@ -92,11 +92,11 @@ class Graph:
         for edge in edges:
             edge_str += str(edge) + " "
         return summary + vertex_str + edge_str
-    
+
     def vertices(self):
         """Return a list of all the vertices in the graph."""
         return [vertex for vertex in self._adj_map]
-    
+
     def edges(self):
         """Return a list of all the edges in the graph."""
         edge_list = []
@@ -106,11 +106,11 @@ class Graph:
                 if edge.start() == v1:
                     edge_list.append(edge)
         return edge_list
-    
+
     def num_vertices(self):
         """Return the total number of vertices in the graph."""
         return len(self._adj_map)
-    
+
     def num_edges(self):
         """Return the total number of edges in the graph."""
         total = 0
@@ -125,7 +125,7 @@ class Graph:
         except KeyError:
             edge = None
         return edge
-    
+
     def get_edges(self, v):
         """Return a list of all the edges incident on v, if any."""
         if v in self._adj_map:
@@ -137,11 +137,11 @@ class Graph:
                     edges.append(edge)
             return edges
         return None
-    
+
     def degree(self, v):
         """Return the degree of vertex v."""
         return len(self._adj_map[v])
-    
+
     def get_vertex_by_label(self, element):
         """Return the first vertex that matches element."""
         for vertex in self._adj_map:
@@ -156,6 +156,7 @@ class Graph:
         return vertex
 
     def add_vertex_if_new(self, element):
+        """Add and return a new vertex. If it already exists, return that."""
         for vertex in self._adj_map:
             if vertex.element() == element:
                 return vertex
@@ -163,7 +164,7 @@ class Graph:
 
     def add_edge(self, v1, v2, label):
         """Add and return an edge between vertices v1 and v2 with a label.
-        
+
         Only adds the edge if both vertices are already in the graph.
         """
         if v1 not in self._adj_map or v2 not in self._adj_map:
@@ -172,47 +173,17 @@ class Graph:
         self._adj_map[v1][v2] = new_edge
         self._adj_map[v2][v1] = new_edge
         return new_edge
-    
+
     def remove_vertex(self, v):
         """Remove vertex v and all incident edges on it."""
         if v in self._adj_map:
             for vertex in self._adj_map[v]:
                 del self._adj_map[vertex][v]
             del self._adj_map[v]
-    
+
     def remove_edge(self, e):
         """Remove edge e."""
         v1 = e.start()
         v2 = e.end()
         del self._adj_map[v1][v2]
         del self._adj_map[v2][v1]
-
-
-def main():
-    graph = Graph()
-    with open("usa.txt", "r") as file:
-        for line in file:
-            data = line.split()
-            state1 = data[0]
-            state2 = data[1]
-            label = "{}{}".format(state1, state2)
-            v1 = graph.add_vertex_if_new(state1)
-            v2 = graph.add_vertex_if_new(state2)
-            graph.add_edge(v1, v2, label)
-    print(graph.num_vertices())
-    print(graph.num_edges())
-
-    print([(graph.degree(v), v.element()) for v in graph.vertices()])
-
-    ny = graph.get_vertex_by_label("NY")
-    ma = graph.get_vertex_by_label("MA")
-    print("degree of ny", graph.degree(ny))
-    print("degree of ma", graph.degree(ma))
-    print(graph.get_edge(ny, ma))
-    graph.remove_vertex(ny)
-    print("degree of ma", graph.degree(ma))
-    print(graph.get_edge(ny, ma))
-
-
-if __name__ == "__main__":
-    main()
