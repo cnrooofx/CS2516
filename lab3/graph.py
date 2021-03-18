@@ -5,15 +5,27 @@ class Vertex:
     """Class to represent a Vertex as part of a Graph."""
 
     def __init__(self, element):
+        """Initialise a new vertex.
+        
+        Args:
+            element (any): The label associated with the vertex.
+        """
         self._element = element
 
     def __str__(self):
+        """Return the string representation of the vertex."""
         return str(self._element)
 
     def __lt__(self, other):
+        """Return True if the vertex is less than the other, otherwise False.
+
+        Args:
+            other (Vertex): The vertex to compare with.
+        """
         return self._element < other.element()
 
     def element(self):
+        """Return the label of the vertex."""
         return self._element
 
 
@@ -21,14 +33,23 @@ class Edge:
     """Class to represent an Edge between two vertices in a Graph."""
 
     def __init__(self, v1, v2, label):
+        """Initialise a new edge.
+
+        Args:
+            v1 (Vertex): The first vertex in the edge.
+            v2 (Vertex): The second vertex in the edge.
+            label (any): The label associated with the edge.
+        """
         self._label = label
         self._v1 = v1
         self._v2 = v2
 
     def __str__(self):
+        """Return a string representation of the edge."""
         return "({} -- {} : {})".format(self._v1, self._v2, self._label)
 
     def element(self):
+        """Return the label of the edge."""
         return self._label
 
     def vertices(self):
@@ -43,23 +64,34 @@ class Edge:
         """Return the second vertex in the ordered pair."""
         return self._v2
 
-    def opposite(self, vertex):
-        if vertex == self._v1:
+    def opposite(self, v):
+        """If the edge is incident on 'v', return the other vertex."""
+        if v == self._v1:
             return self._v2
-        elif vertex == self._v2:
+        elif v == self._v2:
             return self._v1
         return None
 
 
 class Graph:
     """Class to represent an Undirected Graph."""
+
     def __init__(self):
-        """Initialise a new Graph."""
+        """Initialise a new graph."""
         self._adj_map = {}
     
     def __str__(self):
         """Return a string representation of the graph."""
-        return "graph"
+        summary = "|V| = {}; |E| = {}".format(
+            self.num_vertices(), self.num_edges())
+        vertex_str = "\n\nVertices: "
+        for vertex in self._adj_map:
+            vertex_str += str(vertex) + "-"
+        edges = self.edges()
+        edge_str = "\n\nEdges: "
+        for edge in edges:
+            edge_str += str(edge) + " "
+        return summary + vertex_str + edge_str
     
     def vertices(self):
         """Return a list of all the vertices in the graph."""
@@ -130,7 +162,12 @@ class Graph:
         return self.add_vertex(element)
 
     def add_edge(self, v1, v2, label):
-        """Add and return an edge between vertices v1 and v2 with a label."""
+        """Add and return an edge between vertices v1 and v2 with a label.
+        
+        Only adds the edge if both vertices are already in the graph.
+        """
+        if v1 not in self._adj_map or v2 not in self._adj_map:
+            return None
         new_edge = Edge(v1, v2, label)
         self._adj_map[v1][v2] = new_edge
         self._adj_map[v2][v1] = new_edge
@@ -158,12 +195,14 @@ def main():
             data = line.split()
             state1 = data[0]
             state2 = data[1]
-            label = "{} - {}".format(state1, state2)
+            label = "{}{}".format(state1, state2)
             v1 = graph.add_vertex_if_new(state1)
             v2 = graph.add_vertex_if_new(state2)
             graph.add_edge(v1, v2, label)
     print(graph.num_vertices())
     print(graph.num_edges())
+
+    print([(graph.degree(v), v.element()) for v in graph.vertices()])
 
     ny = graph.get_vertex_by_label("NY")
     ma = graph.get_vertex_by_label("MA")
@@ -173,7 +212,6 @@ def main():
     graph.remove_vertex(ny)
     print("degree of ma", graph.degree(ma))
     print(graph.get_edge(ny, ma))
-
 
 
 if __name__ == "__main__":
