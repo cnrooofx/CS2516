@@ -13,7 +13,16 @@ class Edge:
         return self._label
 
     def vertices(self):
+        """Return the pair of vertices in the edge."""
         return (self._v1, self._v2)
+    
+    def start(self):
+        """Return the first vertex in the ordered pair."""
+        return self._v1
+
+    def end(self):
+        """Return the second vertex in the ordered pair."""
+        return self._v2
 
     def opposite(self, vertex):
         if vertex == self._v1:
