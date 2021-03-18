@@ -1,12 +1,14 @@
 """Class to represent a Vertex as part of a Graph."""
 
 class Vertex:
-    def __init__(self, label):
-        self._label = label
+    def __init__(self, element):
+        self._element = element
 
     def __str__(self):
-        return str(self._label)
+        return str(self._element)
+    
+    def __lt__(self, other):
+        return self._element < other.element()
 
-    @property
-    def label(self):
-        return self._label
+    def element(self):
+        return self._element
