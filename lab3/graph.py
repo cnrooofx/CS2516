@@ -8,7 +8,7 @@ class Vertex:
         """Initialise a new vertex.
 
         Args:
-            element (any): The label associated with the vertex.
+            element (any): The data associated with the vertex.
         """
         self._element = element
 
@@ -25,32 +25,32 @@ class Vertex:
         return self._element < other.element()
 
     def element(self):
-        """Return the label of the vertex."""
+        """Return the element associated with the vertex."""
         return self._element
 
 
 class Edge:
     """Class to represent an Edge between two vertices in a Graph."""
 
-    def __init__(self, v1, v2, label):
+    def __init__(self, v1, v2, element):
         """Initialise a new edge.
 
         Args:
             v1 (Vertex): The first vertex in the edge.
             v2 (Vertex): The second vertex in the edge.
-            label (any): The label associated with the edge.
+            element (any): The data associated with the edge.
         """
-        self._label = label
         self._v1 = v1
         self._v2 = v2
+        self._element = element
 
     def __str__(self):
         """Return a string representation of the edge."""
-        return "({} -- {} : {})".format(self._v1, self._v2, self._label)
+        return "({} -- {} : {})".format(self._v1, self._v2, self._element)
 
     def element(self):
-        """Return the label of the edge."""
-        return self._label
+        """Return the element associated with the edge."""
+        return self._element
 
     def vertices(self):
         """Return the pair of vertices in the edge."""
@@ -119,7 +119,12 @@ class Graph:
         return total // 2
 
     def get_edge(self, v1, v2):
-        """Return the edge between v1 and v2, if any."""
+        """Return the edge between v1 and v2, if any.
+        
+        Args:
+            v1 (Vertex): The first vertex in the edge.
+            v2 (Vertex): The second vertex in the edge.
+        """
         try:
             edge = self._adj_map[v1][v2]
         except KeyError:
@@ -127,7 +132,11 @@ class Graph:
         return edge
 
     def get_edges(self, v):
-        """Return a list of all the edges incident on v, if any."""
+        """Return a list of all the edges incident on v, if any.
+        
+        Args:
+            v (Vertex): The vertex to get the edges of.
+        """
         if v in self._adj_map:
             edges = []
             vertices = self._adj_map[v]
@@ -139,50 +148,79 @@ class Graph:
         return None
 
     def degree(self, v):
-        """Return the degree of vertex v."""
+        """Return the degree of vertex v.
+        
+        Args:
+            v (Vertex): The vertex to get the degree of.
+        """
         return len(self._adj_map[v])
 
     def get_vertex_by_label(self, element):
-        """Return the first vertex that matches element."""
+        """Return the first vertex that matches element.
+        
+        Args:
+            element (Element): The element to search for.
+        """
         for vertex in self._adj_map:
             if vertex.element() == element:
                 return vertex
         return None
 
-    def add_vertex(self, label):
-        """Add and return a new vertex."""
-        vertex = Vertex(label)
+    def add_vertex(self, element):
+        """Add and return a new vertex.
+        
+        Args:
+            element (any): The data associated with the vertex.
+        """
+        vertex = Vertex(element)
         self._adj_map[vertex] = {}
         return vertex
 
     def add_vertex_if_new(self, element):
-        """Add and return a new vertex. If it already exists, return that."""
+        """Add and return a new vertex. If it already exists, return that.
+        
+        Args:
+            element (any): The data associated with the vertex.
+        """
         for vertex in self._adj_map:
             if vertex.element() == element:
                 return vertex
         return self.add_vertex(element)
 
-    def add_edge(self, v1, v2, label):
-        """Add and return an edge between vertices v1 and v2 with a label.
+    def add_edge(self, v1, v2, element):
+        """Add and return an edge between vertices v1 and v2.
 
         Only adds the edge if both vertices are already in the graph.
+
+        Args:
+            v1 (Vertex): The first vertex in the edge.
+            v2 (Vertex): The second vertex in the edge.
+            element (any): The data associated with the edge.
         """
         if v1 not in self._adj_map or v2 not in self._adj_map:
             return None
-        new_edge = Edge(v1, v2, label)
+        new_edge = Edge(v1, v2, element)
         self._adj_map[v1][v2] = new_edge
         self._adj_map[v2][v1] = new_edge
         return new_edge
 
     def remove_vertex(self, v):
-        """Remove vertex v and all incident edges on it."""
+        """Remove vertex v and all incident edges on it.
+        
+        Args:
+            v (Vertex): Vertex to be removed.
+        """
         if v in self._adj_map:
             for vertex in self._adj_map[v]:
                 del self._adj_map[vertex][v]
             del self._adj_map[v]
 
     def remove_edge(self, e):
-        """Remove edge e."""
+        """Remove edge e.
+        
+        Args:
+            e (Edge): Edge to be removed.
+        """
         v1 = e.start()
         v2 = e.end()
         del self._adj_map[v1][v2]
