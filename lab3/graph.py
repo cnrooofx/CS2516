@@ -225,3 +225,23 @@ class Graph:
         v2 = e.end()
         del self._adj_map[v1][v2]
         del self._adj_map[v2][v1]
+
+    def depthfirstsearch(self, v):
+        """Return a dictionary of the depth-first search from v.
+
+        Args:
+            v (Vertex): The vertex to start searching from.
+
+        Returns:
+            dfs (dict): Dictionary of the depth-first search.
+        """
+        dfs = {v, None}
+        self._depthfirstsearch(v, dfs)
+        return dfs
+
+    def _depthfirstsearch(self, v, marked):
+        for edge in self.get_edges(v):
+            opposite = edge.opposite(v)
+            if opposite not in marked:
+                marked[opposite] = edge
+                self._depthfirstsearch(opposite, marked)
