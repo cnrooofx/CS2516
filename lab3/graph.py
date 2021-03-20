@@ -140,9 +140,7 @@ class Graph:
             edges = []
             vertices = self._adj_map[v]
             for vertex in vertices:
-                edge = vertices[vertex]
-                if edge.start() == v:
-                    edges.append(edge)
+                edges.append(vertices[vertex])
             return edges
         return None
 
@@ -153,7 +151,7 @@ class Graph:
             v (Vertex): The vertex to get the degree of.
         """
         return len(self._adj_map[v])
-    
+
     def highest_degree(self):
         """Return the vertex with highest degree."""
         highest_degree = -1
