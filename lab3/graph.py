@@ -301,3 +301,21 @@ class Graph:
         for vertex in bfs:
             edge, distance = bfs[vertex]
             print("V: {}, E: {}, Distance: {}".format(vertex, edge, distance))
+
+    def central_vertex(self):
+        """Return the most central vertex in the graph.
+
+        Returns:
+            central (Vertex): The most central vertex.
+        """
+        min_distance = None
+        central = None
+        vertices = self.vertices()
+        if len(vertices) > 0:
+            for vertex in vertices:
+                bfs = self.breadthfirstsearch(vertex)
+                max_distance = self.max_distance(bfs)
+                if not min_distance or max_distance < min_distance:
+                    min_distance = max_distance
+                    central = vertex
+        return central
