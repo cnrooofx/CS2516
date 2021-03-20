@@ -40,13 +40,12 @@ class Edge:
             v2 (Vertex): The second vertex in the edge.
             element (any): The data associated with the edge.
         """
-        self._v1 = v1
-        self._v2 = v2
+        self._edge = (v1, v2)
         self._element = element
 
     def __str__(self):
         """Return a string representation of the edge."""
-        return "({} -- {} : {})".format(self._v1, self._v2, self._element)
+        return "({} -- {} : {})".format(self._edge[0], self._edge[1], self._element)
 
     def element(self):
         """Return the element associated with the edge."""
@@ -54,22 +53,22 @@ class Edge:
 
     def vertices(self):
         """Return the pair of vertices in the edge."""
-        return (self._v1, self._v2)
+        return self._edge
 
     def start(self):
         """Return the first vertex in the ordered pair."""
-        return self._v1
+        return self._edge[0]
 
     def end(self):
         """Return the second vertex in the ordered pair."""
-        return self._v2
+        return self._edge[1]
 
     def opposite(self, v):
         """If the edge is incident on 'v', return the other vertex."""
-        if v == self._v1:
-            return self._v2
-        elif v == self._v2:
-            return self._v1
+        if v == self._edge[0]:
+            return self._edge[1]
+        elif v == self._edge[1]:
+            return self._edge[0]
         return None
 
 
@@ -235,7 +234,7 @@ class Graph:
         Returns:
             dfs (dict): Dictionary of the depth-first search.
         """
-        dfs = {v, None}
+        dfs = {v: None}
         self._depthfirstsearch(v, dfs)
         return dfs
 
@@ -245,3 +244,24 @@ class Graph:
             if opposite not in marked:
                 marked[opposite] = edge
                 self._depthfirstsearch(opposite, marked)
+
+    def breadthfirstsearch(self, v):
+        """Return a dictionary of the breadth-first search from v.
+        """
+        bfs = {v: None}
+        layer = [v]
+        self._breadthfirstsearch(layer, bfs)
+        return bfs
+
+    def _breadthfirstsearch(self, layer, marked):
+        cur_layer = layer
+        next_layer = []
+        for vertex in cur_layer:
+            for edge in self.get_edges(vertex):
+                opposite = edge.opposite(vertex)
+                if opposite not in marked:
+                    marked[opposite] = edge
+                    next_layer.append(opposite)
+        if len(next_layer) > 0:
+            self._breadthfirstsearch(next_layer, marked)
+
