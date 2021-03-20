@@ -153,6 +153,16 @@ class Graph:
             v (Vertex): The vertex to get the degree of.
         """
         return len(self._adj_map[v])
+    
+    def highest_degree(self):
+        """Return the vertex with highest degree."""
+        highest_degree = -1
+        highest_vertex = None
+        for vertex in self._adj_map:
+            if self.degree(vertex) > highest_degree:
+                highest_degree = self.degree(vertex)
+                highest_vertex = vertex
+        return highest_vertex
 
     def get_vertex_by_label(self, element):
         """Return the first vertex that matches element.
@@ -272,3 +282,18 @@ class Graph:
             i += 1
             self._breadthfirstsearch(i, next_layer, marked)
 
+    def max_distance(self, bfs):
+        """Return the max distance to a vertex from a breadth-first search.
+
+        Args:
+            bfs (dict): The result of a breadth-first search from a vertex.
+
+        Returns:
+            max_distance (int): The maximum number of steps to another vertex.
+        """
+        max_distance = -1
+        for vertex in bfs:
+            distance = bfs[vertex][1]
+            if distance > max_distance:
+                max_distance = distance
+        return max_distance
