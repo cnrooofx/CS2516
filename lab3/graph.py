@@ -247,21 +247,28 @@ class Graph:
 
     def breadthfirstsearch(self, v):
         """Return a dictionary of the breadth-first search from v.
+
+        Args:
+            v (Vertex): The vertex to start searching from.
+        
+        Returns:
+            bfs (dict): Dictionary of the breadth-first search.
         """
-        bfs = {v: None}
+        bfs = {v: (None, 0)}
         layer = [v]
-        self._breadthfirstsearch(layer, bfs)
+        i = 1
+        self._breadthfirstsearch(i, layer, bfs)
         return bfs
 
-    def _breadthfirstsearch(self, layer, marked):
-        cur_layer = layer
+    def _breadthfirstsearch(self, i, layer, marked):
         next_layer = []
-        for vertex in cur_layer:
+        for vertex in layer:
             for edge in self.get_edges(vertex):
                 opposite = edge.opposite(vertex)
                 if opposite not in marked:
-                    marked[opposite] = edge
+                    marked[opposite] = (edge, i)
                     next_layer.append(opposite)
         if len(next_layer) > 0:
-            self._breadthfirstsearch(next_layer, marked)
+            i += 1
+            self._breadthfirstsearch(i, next_layer, marked)
 
