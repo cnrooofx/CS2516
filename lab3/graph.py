@@ -297,3 +297,9 @@ class Graph:
             if distance > max_distance:
                 max_distance = distance
         return max_distance
+
+    def print_distances(self, bfs):
+        """Print the paths and distances given a breadth-first search tree."""
+        for vertex in bfs:
+            edge, distance = bfs[vertex]
+            print("V: {}, E: {}, Distance: {}".format(vertex, edge, distance))
