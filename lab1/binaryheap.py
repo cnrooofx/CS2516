@@ -15,10 +15,15 @@ class _BinaryHeap:
     def add(self, item):
         """Add item to the heap."""
         self._body.append(item)
-        self._bubbleup(self._size)
+        self.bubbleup(self._size)
         self._size += 1
 
-    def _swap(self, i, j):
+    def add_from_list(self, inlist):
+        """Add a list of items to the heap."""
+        for item in inlist:
+            self.add(item)
+
+    def swap(self, i, j):
         """Swap the two items at the given indices."""
         self._body[i], self._body[j] = self._body[j], self._body[i]
 
@@ -43,24 +48,26 @@ class MinHeap(_BinaryHeap):
             self._body[0] = self._body[last_pos]
             del self._body[last_pos]
             self._size -= 1
-            self._bubbledown(0)
+            self.bubbledown(0)
         return min_value
 
-    def _bubbleup(self, i):
+    def bubbleup(self, i):
         parent = (i - 1) // 2
         if parent >= 0 and self._body[i] < self._body[parent]:
-            self._swap(i, parent)
-            self._bubbleup(parent)
+            self.swap(i, parent)
+            self.bubbleup(parent)
 
-    def _bubbledown(self, i):
+    def bubbledown(self, i, last=None):
+        if not last:
+            last = self._size
         left = 2 * i + 1
         right = 2 * i + 2
         minchild = left
-        if right < self._size and self._body[right] < self._body[left]:
+        if right < last and self._body[right] < self._body[left]:
             minchild = right
-        if left < self._size and self._body[i] > self._body[minchild]:
-            self._swap(i, minchild)
-            self._bubbledown(minchild)
+        if left < last and self._body[i] > self._body[minchild]:
+            self.swap(i, minchild)
+            self.bubbledown(minchild)
 
 
 class MaxHeap(_BinaryHeap):
@@ -84,21 +91,23 @@ class MaxHeap(_BinaryHeap):
             self._body[0] = self._body[last_pos]
             del self._body[last_pos]
             self._size -= 1
-            self._bubbledown(0)
+            self.bubbledown(0)
         return min_value
 
-    def _bubbleup(self, i):
+    def bubbleup(self, i):
         parent = (i - 1) // 2
         if parent >= 0 and self._body[i] > self._body[parent]:
-            self._swap(i, parent)
-            self._bubbleup(parent)
+            self.swap(i, parent)
+            self.bubbleup(parent)
 
-    def _bubbledown(self, i):
+    def bubbledown(self, i, last=None):
+        if not last:
+            last = self._size
         left = 2 * i + 1
         right = 2 * i + 2
         minchild = left
-        if right < self._size and self._body[right] > self._body[left]:
+        if right < last and self._body[right] > self._body[left]:
             minchild = right
-        if left < self._size and self._body[i] < self._body[minchild]:
-            self._swap(i, minchild)
-            self._bubbledown(minchild)
+        if left < last and self._body[i] < self._body[minchild]:
+            self.swap(i, minchild)
+            self.bubbledown(minchild)
