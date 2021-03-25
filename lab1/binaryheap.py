@@ -3,8 +3,7 @@ class Element:
     def __init__(self, key, item):
         self._key = key
         self._element = item
-        self._position = 0
-    
+
     def __str__(self):
         return "({}, {})".format(self._key, self._element)
     
@@ -24,7 +23,9 @@ class Element:
     @property
     def value(self):
         return self._value
-class BinaryHeap:
+
+
+class MinHeap:
     def __init__(self):
         self._body = []
         self._size = 0
@@ -38,11 +39,36 @@ class BinaryHeap:
         self._bubbleup(self._size)
         self._size += 1
 
+    def get_min(self):
+        if self._size == 0:
+            return None
+        return self._body[0]
+    
+    def remove_min(self):
+        min_value = self.get_min()
+        if min_value:
+            last_pos = self._size - 1
+            self._body[0] = self._body[last_pos]
+            del self._body[last_pos]
+            self._size -= 1
+            self._bubbledown(0)
+        return min_value
+
     def _bubbleup(self, i):
         parent = (i - 1) // 2
         if self._body[i] < self._body[parent]:
             self._swap(i, parent)
             self._bubbleup(parent)
+
+    def _bubbledown(self, i):
+        left = 2 * i + 1
+        right = 2 * i + 2
+        minchild = left
+        if right < self._size and self._body[right] < self._body[left]:
+            minchild = right
+        if self._body[i] > self._body[minchild]:
+            self._swap(i, minchild)
+            self._bubbledown(i)
 
     def _swap(self, i, j):
         self._body[i], self._body[j] = self._body[j], self._body[i]
