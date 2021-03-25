@@ -1,57 +1,42 @@
+"""Min and Max Binary Heaps."""
 
-class Element:
-    def __init__(self, key, item):
-        self._key = key
-        self._element = item
+class _BinaryHeap:
+    """Base Binary Heap."""
 
-    def __str__(self):
-        return "({}, {})".format(self._key, self._element)
-    
-    def __eq__(self, other):
-        return self._key == other.key
-
-    def __lt__(self, other):
-        return self._key < other.key
-
-    def __gt__(self, other):
-        return self._key > other.key
-
-    @property
-    def key(self):
-        return self._key
-
-    @property
-    def value(self):
-        return self._value
-
-
-class BinaryHeap:
     def __init__(self):
+        """Initialise a new Heap."""
         self._body = []
         self._size = 0
 
     def size(self):
+        """Return the size of the heap."""
         return self._size
 
-    def add(self, key, item):
-        element = Element(key, item)
-        self._body.append(element)
+    def add(self, item):
+        """Add item to the heap."""
+        self._body.append(item)
         self._bubbleup(self._size)
         self._size += 1
 
     def _swap(self, i, j):
+        """Swap the two items at the given indices."""
         self._body[i], self._body[j] = self._body[j], self._body[i]
 
-class MinHeap(BinaryHeap):
+class MinHeap(_BinaryHeap):
+    """Minimum Binary Heap with smallest value at the top."""
+
     def __init__(self):
+        """Initialise a new Min Heap."""
         super().__init__()
 
     def get_min(self):
+        """Return the smallest value in the heap."""
         if self._size == 0:
             return None
         return self._body[0]
 
     def remove_min(self):
+        """Remove and return the smallest value in the heap."""
         min_value = self.get_min()
         if min_value:
             last_pos = self._size - 1
@@ -78,16 +63,21 @@ class MinHeap(BinaryHeap):
             self._bubbledown(minchild)
 
 
-class MaxHeap(BinaryHeap):
+class MaxHeap(_BinaryHeap):
+    """Maximum Binary Heap with largest value at the top."""
+
     def __init__(self):
+        """Initialise a new Max Heap."""
         super().__init__()
 
     def get_max(self):
+        """Return the largest value in the heap."""
         if self._size == 0:
             return None
         return self._body[0]
 
     def remove_max(self):
+        """Remove and return the largest value in the heap."""
         min_value = self.get_max()
         if min_value:
             last_pos = self._size - 1
