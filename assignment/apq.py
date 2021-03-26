@@ -77,15 +77,24 @@ class AdaptablePQ:
         return (key, value)
 
     def remove(self, element):
-        """Remove and return the given element from the queue."""
+        """Remove and return the given element from the queue.
+
+        Args:
+            element (Element): An element already in the queue"""
         index = element.get_index()
+        if index >= self._size or self._heap[index] is not element:
+            return None
+        # Swap the element with the last item in the queue
         self._swap(index, self._size - 1)
+        # Remove the last item (now the required element) and update size
+        removed = self._heap.pop()
+        self._size -= 1
+
         parent = (index - 1) // 2
         if self._heap[index] < self._heap[parent]:
             self._bubbleup(index)
         else:
             self._bubbledown(index)
-        removed = self._heap.pop(-1)
         key, value = removed.get_key(), removed.get_value()
         return (key, value)
 
@@ -105,16 +114,14 @@ class AdaptablePQ:
         left = 2 * i + 1
         right = 2 * i + 2
         minchild = left
-        if right < last and self._heap[right] < self._heap[left]:
+        if right < self._size and self._heap[right] < self._heap[left]:
             minchild = right
-        if left < last and self._heap[i] > self._heap[minchild]:
+        if left < self._size and self._heap[i] > self._heap[minchild]:
             self._swap(i, minchild)
             self._bubbledown(minchild)
     
     def _swap(self, i, j):
         """Swap the two elements at the given indices."""
-        index_i = self._heap[i].get_index()
-        index_j = self._heap[j].get_index()
         self._heap[i], self._heap[j] = self._heap[j], self._heap[i]
-        self._heap[i].set_index(index_j)
-        self._heap[j].set_index(index_i)
+        self._heap[i].set_index(i)
+        self._heap[j].set_index(j)
