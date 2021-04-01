@@ -1,116 +1,152 @@
 """Adaptable Priority Queue."""
 
 class Element:
+    """An Element to store data with an associated key."""
+
     def __init__(self, key, value, index):
+        """Initialise a new element.
+
+        Args:
+            key (any): The key associated with the data.
+            value (any): The data of the element.
+            index (int): The index of the element in a data structure.
+        """
         self._key = key
         self._value = value
         self._index = index
 
-    def __str__(self):
-        return "({}, {})".format(self._key, self._value)
-
     def __eq__(self, other):
-        return self._key == other.get_key()
+        """Return True if this key is equal to the other, otherwise False."""
+        return self._key == other._key
 
     def __lt__(self, other):
-        return self._key < other.get_key()
+        """Return True if this key is less than the other, otherwise False."""
+        return self._key < other._key
 
     def __gt__(self, other):
-        return self._key > other.get_key()
+        """Return True if this key is greater than other, otherwise False."""
+        return self._key > other._key
 
-    def get_key(self):
-        return self._key
-
-    def get_value(self):
-        return self._value
-    
-    def get_index(self):
-        return self._index
-
-    def set_index(self, i):
-        self._index = i
-    
-    def wipe(self):
+    def _wipe(self):
+        """Clear all of the data in the element."""
         self._key = None
         self._value = None
         self._index = None
 
 
 class AdaptablePQ:
-    """Adaptable Priority Queue.
-    
-    The smallest key value has the highest priority.
-    """
+    """Adaptable Priority Queue."""
 
     def __init__(self):
         """Initialise a new queue."""
         self._heap = []
+        self._lookup = {}
         self._size = 0
 
+    def length(self):
+        """Return the length of the queue."""
+        return self._size
+    
+    def search(self, item):
+        """Get the reference to the item in the queue."""
+        try:
+            element = self._lookup[item]
+        except KeyError:
+            element = None
+        return element
+
     def add(self, key, item):
+        """Add an item to the queue with the specified priority.
+
+        Returns:
+            A reference to the item within the queue.
+        """
         index = self._size
         element = Element(key, item, index)
+        self._lookup[item] = element
         self._heap.append(element)
         self._bubbleup(index)
         self._size += 1
         return element
 
     def get_min(self):
-        """Return the highest priority item in the queue."""
+        """Return the highest priority item in the queue.
+
+        Returns:
+            The element with the smallest key value.
+        """
         if self._size == 0:
             return None
         return self._heap[0]
-
-    def remove_min(self):
-        """Remove and return the highest priority item in the queue."""
-        min_value = self.get_min()
-        if min_value is None:
-            return None
-
-        last_pos = self._size - 1
-        self._heap[0] = self._heap[last_pos]
-        del self._heap[last_pos]
-        self._size -= 1
-        self._bubbledown(0)
-
-        key, value = min_value.get_key(), min_value.get_value()
-        return (key, value)
 
     def remove(self, element):
         """Remove and return the given element from the queue.
 
         Args:
-            element (Element): An element already in the queue"""
-        index = element.get_index()
+            element (Element): An element already in the queue.
+
+        Returns:
+            The (key, value) pair from the element.
+        """
+        index = element._index
         if index >= self._size or self._heap[index] is not element:
             return None
         # Swap the element with the last item in the queue
         self._swap(index, self._size - 1)
         # Remove the last item (now the required element) and update size
-        removed = self._heap.pop()
+        removed_element = self._heap.pop()
         self._size -= 1
+        self._rebalance(index)
 
-        parent = (index - 1) // 2
-        if self._heap[index] < self._heap[parent]:
-            self._bubbleup(index)
-        else:
-            self._bubbledown(index)
-        key, value = removed.get_key(), removed.get_value()
+        key, value = removed_element._key, removed_element._value
+        removed_element._wipe()
         return (key, value)
-
-    def length(self):
-        """Return the length of the queue."""
-        return self._size
     
+    def remove_min(self):
+        """Remove and return the highest priority item in the queue.
+
+        Returns:
+            The (key, value) pair of the highest priority item.
+        """
+        min_value = self.get_min()
+        if min_value is not None:
+            return self.remove(min_value)
+
+    def get_key(self, element):
+        """Return the current key for element.
+
+        Args:
+            element (Element): An element already in the queue.
+
+        Returns:
+            The key of the given element.
+        """
+        return element._key
+
+    def update_key(self, element, newkey):
+        """Update the key of the element."""
+        if element._key is not None and element._value is not None:
+            element._key = newkey
+            index = element._index
+            self._rebalance(index)
+
+    def _rebalance(self, i):
+        """Rebalance the item at index to the correct position."""
+        parent = (i - 1) // 2
+        if parent >= 0 and self._heap[i] < self._heap[parent]:
+            self._bubbleup(i)
+        else:
+            self._bubbledown(i)
+
     def _bubbleup(self, i):
+        """Bubble item at index up to its correct position in the heap."""
         parent = (i - 1) // 2
         if parent >= 0 and self._heap[i] < self._heap[parent]:
             self._swap(i, parent)
             self._bubbleup(parent)
 
-    def _bubbledown(self, i, last=None):
-        if not last:
-            last = self._size
+    def _bubbledown(self, i):
+        """Bubble item at index down to its correct position in the heap."""
         left = 2 * i + 1
         right = 2 * i + 2
         minchild = left
@@ -123,5 +159,5 @@ class AdaptablePQ:
     def _swap(self, i, j):
         """Swap the two elements at the given indices."""
         self._heap[i], self._heap[j] = self._heap[j], self._heap[i]
-        self._heap[i].set_index(i)
-        self._heap[j].set_index(j)
+        self._heap[i]._index = i
+        self._heap[j]._index = j
