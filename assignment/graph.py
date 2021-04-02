@@ -1,5 +1,4 @@
-"""Classes that make up an Undirected Graph ADT."""
-
+"""Undirected Graph ADT."""
 
 class Vertex:
     """Class to represent a Vertex as part of a Graph."""
@@ -32,20 +31,26 @@ class Vertex:
 class Edge:
     """Class to represent an Edge between two vertices in a Graph."""
 
-    def __init__(self, v1, v2, element):
+    def __init__(self, element, v1, v2, weight=None):
         """Initialise a new edge.
 
         Args:
+            label (any): The data associated with the edge.
             v1 (Vertex): The first vertex in the edge.
             v2 (Vertex): The second vertex in the edge.
-            element (any): The data associated with the edge.
+            weight (int): The weight of the edge (Default: None)
         """
-        self._edge = (v1, v2)
         self._element = element
+        self._edge = (v1, v2)
+        self._weight = weight
 
     def __str__(self):
         """Return a string representation of the edge."""
-        return "({} -- {} : {})".format(self._edge[0], self._edge[1], self._element)
+        string = "(E: {}; {} -- {}".format(self._element, self._edge[0], self._edge[1])
+        if self._weight is not None:
+            string += "; Weight: {})".format(self._weight)
+        string += ")"
+        return string
 
     def element(self):
         """Return the element associated with the edge."""
@@ -54,6 +59,9 @@ class Edge:
     def vertices(self):
         """Return the pair of vertices in the edge."""
         return self._edge
+
+    def weight(self):
+        return self._weight
 
     def start(self):
         """Return the first vertex in the ordered pair."""
@@ -73,7 +81,7 @@ class Edge:
 
 
 class Graph:
-    """Class to represent an Undirected Graph."""
+    """Undirected Graph."""
 
     def __init__(self):
         """Initialise a new graph."""
@@ -206,7 +214,7 @@ class Graph:
         """
         if v1 not in self._adj_map or v2 not in self._adj_map:
             return None
-        new_edge = Edge(v1, v2, element)
+        new_edge = Edge(element, v1, v2)
         self._adj_map[v1][v2] = new_edge
         self._adj_map[v2][v1] = new_edge
         return new_edge
