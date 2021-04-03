@@ -55,7 +55,7 @@ class AdaptablePQ:
             element = None
         return element
 
-    def add(self, key, item):
+    def add(self, item, key):
         """Add an item to the queue with the specified priority.
 
         Returns:
@@ -100,6 +100,7 @@ class AdaptablePQ:
 
         key, value = removed_element._key, removed_element._value
         removed_element._wipe()
+        del self._lookup[value]
         return (key, value)
     
     def remove_min(self):
