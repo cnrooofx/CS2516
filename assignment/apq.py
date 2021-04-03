@@ -46,14 +46,14 @@ class AdaptablePQ:
         """Return the length of the queue."""
         return self._size
 
-    def add(self, item, key):
+    def add(self, key, value):
         """Add an item to the queue with the specified priority.
 
         Returns:
             A reference to the item within the queue.
         """
         index = self._size
-        element = Element(key, item, index)
+        element = Element(key, value, index)
         self._heap.append(element)
         self._bubbleup(index)
         self._size += 1
@@ -171,13 +171,13 @@ class SearchableAPQ(AdaptablePQ):
             element = None
         return element
     
-    def add(self, item, key):
+    def add(self, key, value):
         """Add an item to the queue with the specified priority.
 
         Returns:
             A reference to the item within the queue.
         """
-        element = super().add(item, key)
+        element = super().add(key, value)
         self._lookup[item] = element
         return element
 

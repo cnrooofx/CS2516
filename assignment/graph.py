@@ -328,34 +328,29 @@ class Graph:
         closed = {}
         predecessors = {v: None}
 
-        element = opened.add(v, 0)
-        locations[v] = element
+        start_element = opened.add(0, v)
+        locations[v] = start_element
         while opened.length() > 0:
             cost, vertex = opened.remove_min()
             predecessor = predecessors.pop(vertex)
             del locations[vertex]
-            print(cost, vertex)
-            print("pred:", predecessor)
 
             closed[vertex] = (cost, predecessor)
-            print(self.get_edges(vertex))
             edges = self.get_edges(vertex)
             if edges is None:
                 break
             for edge in edges:
-                print("Edge", edge)
                 opp_vertex = edge.opposite(vertex)
                 if opp_vertex not in closed:
                     new_cost = cost + edge.element()
                     if opp_vertex not in locations:
                         predecessors[opp_vertex] = vertex
-                        opp_element = opened.add(opp_vertex, new_cost)
-                        locations[opp_vertex] = opp_element
+                        element = opened.add(new_cost, opp_vertex)
+                        locations[opp_vertex] = element
                     else:
-                        opp_element = locations[opp_vertex]
-                        old_cost = opened.get_key(opp_element)
+                        element = locations[opp_vertex]
+                        old_cost = opened.get_key(element)
                         if new_cost < old_cost:
-                            print("newcost", new_cost, old_cost)
                             predecessors[opp_vertex] = vertex
-                            opened.update_key(opp_element, new_cost)
+                            opened.update_key(element, new_cost)
         return closed
