@@ -40,20 +40,11 @@ class AdaptablePQ:
     def __init__(self):
         """Initialise a new queue."""
         self._heap = []
-        self._lookup = {}
         self._size = 0
 
     def length(self):
         """Return the length of the queue."""
         return self._size
-    
-    def search(self, item):
-        """Get the reference to the item in the queue."""
-        try:
-            element = self._lookup[item]
-        except KeyError:
-            element = None
-        return element
 
     def add(self, item, key):
         """Add an item to the queue with the specified priority.
@@ -63,7 +54,6 @@ class AdaptablePQ:
         """
         index = self._size
         element = Element(key, item, index)
-        self._lookup[item] = element
         self._heap.append(element)
         self._bubbleup(index)
         self._size += 1
@@ -100,7 +90,6 @@ class AdaptablePQ:
 
         key, value = removed_element._key, removed_element._value
         removed_element._wipe()
-        del self._lookup[value]
         return (key, value)
     
     def remove_min(self):
@@ -162,3 +151,45 @@ class AdaptablePQ:
         self._heap[i], self._heap[j] = self._heap[j], self._heap[i]
         self._heap[i]._index = i
         self._heap[j]._index = j
+
+
+class SearchableAPQ(AdaptablePQ):
+    """Searchable Adaptable Priority Queue.
+
+    Has a lookup structure for getting references to items within the queue.
+    """
+
+    def __init__(self):
+        super().__init__()
+        self._lookup = {}
+    
+    def search(self, item):
+        """Get the reference to the item in the queue."""
+        try:
+            element = self._lookup[item]
+        except KeyError:
+            element = None
+        return element
+    
+    def add(self, item, key):
+        """Add an item to the queue with the specified priority.
+
+        Returns:
+            A reference to the item within the queue.
+        """
+        element = super().add(item, key)
+        self._lookup[item] = element
+        return element
+
+    def remove(self, element):
+        """Remove and return the given element from the queue.
+
+        Args:
+            element (Element): An element already in the queue.
+
+        Returns:
+            The (key, value) pair from the element.
+        """
+        removed = super().remove(element)
+        del self._lookup[removed[1]]
+        return removed
