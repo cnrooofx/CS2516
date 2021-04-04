@@ -1,6 +1,7 @@
 """Undirected Graph ADT."""
 
 from apq import AdaptablePQ
+from time import time
 
 class Vertex:
     """Class to represent a Vertex as part of a Graph."""
@@ -322,6 +323,15 @@ class Graph:
         return central
 
     def shortest_paths(self, v):
+        """Dijkstra's Algorithm for finding shortest paths to other vertices.
+
+        Args:
+            v (Vertex): Start vertex to find paths from.
+
+        Returns:
+            A dictionary with vertices as keys and (cost, predecessor)
+            pairs as values.
+        """
         opened = AdaptablePQ()
         locations = {}
         closed = {}
@@ -336,18 +346,85 @@ class Graph:
 
             closed[vertex] = (cost, predecessor)
             for edge in self.get_edges(vertex):
-                opp_vertex = edge.opposite(vertex)
-                if opp_vertex not in closed:
+                opposite_vertex = edge.opposite(vertex)
+                if opposite_vertex not in closed:
                     new_cost = cost + edge.element()
-                    if opp_vertex not in locations:
-                        predecessors[opp_vertex] = vertex
-                        element = opened.add(new_cost, opp_vertex)
-                        locations[opp_vertex] = element
+                    if opposite_vertex not in locations:
+                        # Set the current vertex's predecessor
+                        predecessors[opposite_vertex] = vertex
+                        # Add the current vertex to opened with it's cost
+                        element = opened.add(new_cost, opposite_vertex)
+                        locations[opposite_vertex] = element
                     else:
-                        element = locations[opp_vertex]
+                        element = locations[opposite_vertex]
                         old_cost = opened.get_key(element)
                         # If the new cost is better than the old cost
                         if new_cost < old_cost:
-                            predecessors[opp_vertex] = vertex
+                            # Replace the old predecessor with current vertex
+                            predecessors[opposite_vertex] = vertex
+                            # Update the cost to current vertex in opened
                             opened.update_key(element, new_cost)
         return closed
+
+
+def read_graph(filename):
+    graph = Graph()
+    with open(filename, "r") as file:
+        entry = file.readline()
+        count = 0
+        while entry == "Node\n":
+            count += 1
+            nodeid = int(file.readline().split()[1])
+            graph.add_vertex(nodeid)
+            entry = file.readline()
+        verts = len(graph.vertices())
+        print("Read {} vertices and added {} into graph".format(count, verts))
+        count = 0
+        while entry == "Edge\n":
+            count += 1
+            source = int(file.readline().split()[1])
+            sv = graph.get_vertex_by_label(source)
+            target = int(file.readline().split()[1])
+            tv = graph.get_vertex_by_label(target)
+            length = float(file.readline().split()[1])
+            graph.add_edge(sv, tv, length)
+            file.readline()
+            entry = file.readline()
+        edges = len(graph.edges())
+        print("Read {} edges and added {} into graph".format(count, edges))
+        print(graph, "\n")
+        return graph
+
+
+def test_shortest_paths(filename, start_vertex, end_vertex):
+    graph = read_graph(filename)
+    start_v = graph.get_vertex_by_label(start_vertex)
+    end_v = graph.get_vertex_by_label(end_vertex)
+    start = time()
+    paths = graph.shortest_paths(start_v)
+    end = time()
+    print("Time to get shortest paths {} s".format(end - start))
+
+    for vertex, value in paths.items():
+        cost, predecessor = value[0], value[1]
+        print("{} -> Cost: {}, Pred: {}".format(vertex, cost, predecessor))
+    result_path = paths[end_v]
+
+    print("\n" + "*" * 25 + "\n")
+    return result_path
+
+
+def main():
+    result = test_shortest_paths("testfiles/simplegraph1.txt", 1, 4)
+    cost, pred = result[0], result[1]
+    assert cost == 8.0
+    print(pred)
+
+    result = test_shortest_paths("testfiles/simplegraph2.txt", 14, 5)
+    cost, pred = result[0], result[1]
+    assert cost == 16.0
+    print(pred)
+
+
+if __name__ == "__main__":
+    main()
