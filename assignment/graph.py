@@ -138,13 +138,12 @@ class Graph:
         Args:
             v (Vertex): The vertex to get the edges of.
         """
+        edges = []
         if v in self._adj_map:
-            edges = []
             vertices = self._adj_map[v]
             for vertex in vertices:
                 edges.append(vertices[vertex])
-            return edges
-        return None
+        return edges
 
     def degree(self, v):
         """Return the degree of vertex v.
@@ -336,10 +335,7 @@ class Graph:
             del locations[vertex]
 
             closed[vertex] = (cost, predecessor)
-            edges = self.get_edges(vertex)
-            if edges is None:
-                break
-            for edge in edges:
+            for edge in self.get_edges(vertex):
                 opp_vertex = edge.opposite(vertex)
                 if opp_vertex not in closed:
                     new_cost = cost + edge.element()
@@ -350,6 +346,7 @@ class Graph:
                     else:
                         element = locations[opp_vertex]
                         old_cost = opened.get_key(element)
+                        # If the new cost is better than the old cost
                         if new_cost < old_cost:
                             predecessors[opp_vertex] = vertex
                             opened.update_key(element, new_cost)
