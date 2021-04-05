@@ -392,8 +392,8 @@ def read_graph(filename):
             entry = file.readline()
         edges = len(graph.edges())
         print("Read {} edges and added {} into graph".format(count, edges))
-        print(graph, "\n")
-        return graph
+    print(graph, "\n")
+    return graph
 
 
 def test_shortest_paths(filename, start_vertex, end_vertex):
