@@ -42,6 +42,21 @@ class RouteMap(Graph):
         path.reverse()
         return path
 
+    def print_path(self, path):
+        """Prints the path with the coordinates and cost of each step.
+
+        Args:
+            path (list): A list with the vertices on a path.
+        """
+        print("type\tlatitude\tlongitude\telement\tcost")
+        for step in path:
+            vertex, cost = step[0], step[1]
+            coordinates = self._coords[vertex]
+            latitude = coordinates[0]
+            longitude = coordinates[1]
+            elt = vertex.element()
+            print("W\t{}\t{}\t{}\t{}".format(latitude, longitude, elt, cost))
+
 
 def read_route_graph(filename):
     graph = RouteMap()
