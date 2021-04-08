@@ -105,7 +105,7 @@ class RouteMap(Graph):
                 longitude = round(float(gps[2]), 6)
                 self.add_vertex(nodeid, (latitude, longitude))
                 entry = file.readline()
-            verts = len(self.vertices())
+            verts = self.num_vertices()
             print("Read {} vertices, added {} into graph".format(count, verts))
             count = 0
             while entry == "Edge\n":
@@ -119,11 +119,12 @@ class RouteMap(Graph):
                 file.readline()  # Oneway
                 entry = file.readline()
                 self.add_edge(sv, tv, edge_time)
-            edges = len(self.edges())
+            edges = self.num_edges()
             print("Read {} edges, added {} into graph".format(count, edges))
         end = time()
-        total_time = end - start
+        total_time = round((end - start), 4)
         print("Time to build graph {}s".format(total_time))
+        print("-" * 25, "\n")
 
 
 def main():
@@ -138,12 +139,23 @@ def main():
     ids["gaol"] = 3777201945
     ids["mahonpoint"] = 330068634
 
-    sourcestr = "wgb"
-    deststr = "neptune"
-    source = routemap.get_vertex_by_label(ids[sourcestr])
-    dest = routemap.get_vertex_by_label(ids[deststr])
-    tree = routemap.sp(source, dest)
-    routemap.print_path(tree)
+    paths = [("wgb", "neptune"), ("oldoak", "cuh"), ("gaol", "mahonpoint")]
+
+    for path in paths:
+        source = path[0]
+        destination = path[1]
+        source_vertex = routemap.get_vertex_by_label(ids[source])
+        dest_vertex = routemap.get_vertex_by_label(ids[destination])
+
+        start = time()
+        tree = routemap.sp(source_vertex, dest_vertex)
+        end = time()
+
+        path_str = "{}->{}".format(source, destination)
+        routemap.print_path(tree)
+        # routemap.save_path_to_file(tree, path_str)
+        path_time = round((end - start), 4)
+        print("\nTime to get path from {}: {}s\n".format(path_str, path_time))
 
 
 if __name__ == "__main__":
