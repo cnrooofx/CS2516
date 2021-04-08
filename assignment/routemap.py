@@ -1,20 +1,46 @@
 from graph import Graph
 
 class RouteMap(Graph):
+    """Graph to represent a road map."""
 
     def __init__(self):
+        """Initialise a new RouteMap."""
         super().__init__()
         self._coords = {}
     
     def __str__(self):
+        """Return a string representation of the route map."""
         if self.num_edges() > 100 or self.num_vertices() > 100:
             return "Too Many Vertices or Edges to print"
         return super().__str__()
 
     def add_vertex(self, element, coordinates):
+        """Add a new vertex into the route map with a pair of coordinates."""
         vertex = super().add_vertex(element)
         self._coords[vertex] = coordinates
         return vertex
+
+    def sp(self, v, w):
+        """Get the shortest path from vertex v to w.
+
+        Args:
+            v (Vertex): Start vertex in the path.
+            w (Vertex): End vertex in the path.
+
+        Returns:
+            A list of the vertices on the path from v to w with their costs.
+        """
+        shortest_paths = self.shortest_paths(v)
+        path = []
+        target = w
+
+        while target is not None:
+            data = shortest_paths[target]
+            cost, predecessor = data[0], data[1]
+            path.append((target, cost))
+            target = predecessor
+        path.reverse()
+        return path
 
 
 def read_route_graph(filename):
