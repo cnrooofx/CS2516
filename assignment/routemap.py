@@ -55,7 +55,7 @@ class RouteMap(Graph):
         return path
 
     def print_path(self, path):
-        """Prints the path with the coordinates and cost of each step.
+        """Print the path with the coordinates and cost of each step.
 
         Args:
             path (list): A list with the vertices on a path.
@@ -64,10 +64,28 @@ class RouteMap(Graph):
         for step in path:
             vertex, cost = step[0], step[1]
             coordinates = self._coords[vertex]
-            latitude = coordinates[0]
-            longitude = coordinates[1]
+            lat = coordinates[0]
+            lon = coordinates[1]
             elt = vertex.element()
-            print("W\t{}\t{}\t{}\t{}".format(latitude, longitude, elt, cost))
+            print("W\t{}\t{}\t{}\t{}".format(lat, lon, elt, cost))
+
+    def save_path_to_file(self, path, filename):
+        """Write the path with the coordinates and cost of each step to a file.
+
+        Args:
+            path (list): A list with the vertices on a path.
+            filename (str): Name of the output file
+        """
+        filename += ".txt"
+        with open(filename, "w") as file:
+            file.write("type\tlatitude\tlongitude\telement\tcost\n")
+            for step in path:
+                vertex, cost = step[0], step[1]
+                coordinates = self._coords[vertex]
+                lat = coordinates[0]
+                lon = coordinates[1]
+                elt = vertex.element()
+                file.write("W\t{}\t{}\t{}\t{}\n".format(lat, lon, elt, cost))
 
     def read_route_graph(self, filename):
         """Build a route map from the given file.
@@ -109,7 +127,24 @@ class RouteMap(Graph):
 
 
 def main():
-    graph = RouteMap("corkCityData.txt")
+    routemap = RouteMap("corkCityData.txt")
+
+    ids = {}
+    ids["wgb"] = 1669466540
+    ids["turnerscross"] = 348809726
+    ids["neptune"] = 1147697924
+    ids["cuh"] = 860206013
+    ids["oldoak"] = 358357
+    ids["gaol"] = 3777201945
+    ids["mahonpoint"] = 330068634
+
+    sourcestr = "wgb"
+    deststr = "neptune"
+    source = routemap.get_vertex_by_label(ids[sourcestr])
+    dest = routemap.get_vertex_by_label(ids[deststr])
+    tree = routemap.sp(source, dest)
+    routemap.print_path(tree)
+
 
 if __name__ == "__main__":
     main()
