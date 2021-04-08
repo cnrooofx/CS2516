@@ -1,13 +1,25 @@
+"""Route Map Graph."""
+
+from time import time
 from graph import Graph
+
 
 class RouteMap(Graph):
     """Graph to represent a road map."""
 
-    def __init__(self):
-        """Initialise a new RouteMap."""
+    def __init__(self, filename=None):
+        """Initialise a new RouteMap, optionally from a file.
+        
+        Args:
+            filename (str): Path to the file containing the graph.
+                            (Default: None)
+        """
         super().__init__()
         self._coords = {}
-    
+
+        if filename:
+            self.read_route_graph(filename)
+
     def __str__(self):
         """Return a string representation of the route map."""
         if self.num_edges() > 100 or self.num_vertices() > 100:
@@ -57,44 +69,47 @@ class RouteMap(Graph):
             elt = vertex.element()
             print("W\t{}\t{}\t{}\t{}".format(latitude, longitude, elt, cost))
 
+    def read_route_graph(self, filename):
+        """Build a route map from the given file.
 
-def read_route_graph(filename):
-    graph = RouteMap()
-    with open(filename, "r") as file:
-        entry = file.readline()
-        count = 0
-        while entry == "Node\n":
-            count += 1
-            nodeid = int(file.readline().split()[1])
-            gps = file.readline().split()
-            latitude = round(float(gps[1]), 6)
-            longitude = round(float(gps[2]), 6)
-            coordinates = (latitude, longitude)
-            graph.add_vertex(nodeid, coordinates)
+        Args:
+            filename (str): The path to the graph file.
+        """
+        start = time()
+        with open(filename, "r") as file:
             entry = file.readline()
-        verts = len(graph.vertices())
-        print("Read {} vertices and added {} into graph".format(count, verts))
-        count = 0
-        while entry == "Edge\n":
-            count += 1
-            source = int(file.readline().split()[1])
-            sv = graph.get_vertex_by_label(source)
-            target = int(file.readline().split()[1])
-            tv = graph.get_vertex_by_label(target)
-            file.readline()  # Length
-            time = float(file.readline().split()[1])
-            file.readline()  # Oneway
-            entry = file.readline()
-            graph.add_edge(sv, tv, time)
-        edges = len(graph.edges())
-        print("Read {} edges and added {} into graph".format(count, edges))
-    print(graph, "\n")
-    return graph
+            count = 0
+            while entry == "Node\n":
+                count += 1
+                nodeid = int(file.readline().split()[1])
+                gps = file.readline().split()
+                latitude = round(float(gps[1]), 6)
+                longitude = round(float(gps[2]), 6)
+                self.add_vertex(nodeid, (latitude, longitude))
+                entry = file.readline()
+            verts = len(self.vertices())
+            print("Read {} vertices, added {} into graph".format(count, verts))
+            count = 0
+            while entry == "Edge\n":
+                count += 1
+                source = int(file.readline().split()[1])
+                sv = self.get_vertex_by_label(source)
+                target = int(file.readline().split()[1])
+                tv = self.get_vertex_by_label(target)
+                file.readline()  # Length
+                edge_time = float(file.readline().split()[1])
+                file.readline()  # Oneway
+                entry = file.readline()
+                self.add_edge(sv, tv, edge_time)
+            edges = len(self.edges())
+            print("Read {} edges, added {} into graph".format(count, edges))
+        end = time()
+        total_time = end - start
+        print("Time to build graph {}s".format(total_time))
 
 
 def main():
-    graph = read_route_graph("testfiles/simpleroute.txt")
-
+    graph = RouteMap("corkCityData.txt")
 
 if __name__ == "__main__":
     main()
