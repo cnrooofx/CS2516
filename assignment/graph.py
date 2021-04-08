@@ -3,6 +3,7 @@
 from apq import AdaptablePQ
 from time import time
 
+
 class Vertex:
     """Class to represent a Vertex as part of a Graph."""
 
@@ -18,13 +19,29 @@ class Vertex:
         """Return the string representation of the vertex."""
         return str(self._element)
 
+    def __eq__(self, other):
+        """Return True if the vertex is equal to the other, otherwise False.
+
+        Args:
+            other (Vertex): The vertex to compare with.
+        """
+        if isinstance(other, Vertex):
+            return self._element == other.element()
+        return self._element == other
+
     def __lt__(self, other):
         """Return True if the vertex is less than the other, otherwise False.
 
         Args:
             other (Vertex): The vertex to compare with.
         """
-        return self._element < other.element()
+        if isinstance(other, Vertex):
+            return self._element < other.element()
+        return self._element < other
+
+    def __hash__(self):
+        """Return the hash of the Vertex."""
+        return hash(self._element)
 
     def element(self):
         """Return the element associated with the vertex."""
@@ -81,6 +98,7 @@ class Graph:
     def __init__(self):
         """Initialise a new graph."""
         self._adj_map = {}
+        self._vertices = {}
 
     def __str__(self):
         """Return a string representation of the graph."""
@@ -122,7 +140,7 @@ class Graph:
 
     def get_edge(self, v1, v2):
         """Return the edge between v1 and v2, if any.
-        
+
         Args:
             v1 (Vertex): The first vertex in the edge.
             v2 (Vertex): The second vertex in the edge.
@@ -135,7 +153,7 @@ class Graph:
 
     def get_edges(self, v):
         """Return a list of all the edges incident on v, if any.
-        
+
         Args:
             v (Vertex): The vertex to get the edges of.
         """
@@ -148,7 +166,7 @@ class Graph:
 
     def degree(self, v):
         """Return the degree of vertex v.
-        
+
         Args:
             v (Vertex): The vertex to get the degree of.
         """
@@ -166,28 +184,30 @@ class Graph:
 
     def get_vertex_by_label(self, element):
         """Return the first vertex that matches element.
-        
+
         Args:
             element (Element): The element to search for.
         """
-        for vertex in self._adj_map:
-            if vertex.element() == element:
-                return vertex
-        return None
+        try:
+            vertex = self._vertices[element]
+        except KeyError:
+            vertex = None
+        return vertex
 
     def add_vertex(self, element):
         """Add and return a new vertex.
-        
+
         Args:
             element (any): The data associated with the vertex.
         """
         vertex = Vertex(element)
         self._adj_map[vertex] = {}
+        self._vertices[element] = vertex
         return vertex
 
     def add_vertex_if_new(self, element):
         """Add and return a new vertex. If it already exists, return that.
-        
+
         Args:
             element (any): The data associated with the vertex.
         """
@@ -215,7 +235,7 @@ class Graph:
 
     def remove_vertex(self, v):
         """Remove vertex v and all incident edges on it.
-        
+
         Args:
             v (Vertex): Vertex to be removed.
         """
@@ -226,7 +246,7 @@ class Graph:
 
     def remove_edge(self, e):
         """Remove edge e.
-        
+
         Args:
             e (Edge): Edge to be removed.
         """
@@ -240,9 +260,6 @@ class Graph:
 
         Args:
             v (Vertex): The vertex to start searching from.
-
-        Returns:
-            dfs (dict): Dictionary of the depth-first search.
         """
         dfs = {v: None}
         self._depthfirstsearch(v, dfs)
@@ -260,9 +277,6 @@ class Graph:
 
         Args:
             v (Vertex): The vertex to start searching from.
-        
-        Returns:
-            bfs (dict): Dictionary of the breadth-first search.
         """
         bfs = {v: (None, 0)}
         layer = [v]
@@ -287,9 +301,6 @@ class Graph:
 
         Args:
             bfs (dict): The result of a breadth-first search from a vertex.
-
-        Returns:
-            max_distance (int): The maximum number of steps to another vertex.
         """
         max_distance = -1
         for vertex in bfs:
@@ -305,11 +316,7 @@ class Graph:
             print("V: {}, E: {}, Distance: {}".format(vertex, edge, distance))
 
     def central_vertex(self):
-        """Return the most central vertex in the graph.
-
-        Returns:
-            central (Vertex): The most central vertex.
-        """
+        """Return the most central vertex in the graph."""
         min_distance = None
         central = None
         vertices = self.vertices()
@@ -415,12 +422,12 @@ def test_shortest_paths(filename, start_vertex, end_vertex):
 
 
 def main():
-    result = test_shortest_paths("testfiles/simplegraph1.txt", 1, 4)
+    result = test_shortest_paths("simplegraph1.txt", 1, 4)
     cost, pred = result[0], result[1]
     assert cost == 8.0
     print(pred)
 
-    result = test_shortest_paths("testfiles/simplegraph2.txt", 14, 5)
+    result = test_shortest_paths("simplegraph2.txt", 14, 5)
     cost, pred = result[0], result[1]
     assert cost == 16.0
     print(pred)
