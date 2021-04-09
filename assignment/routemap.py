@@ -27,10 +27,25 @@ class RouteMap(Graph):
         return super().__str__()
 
     def add_vertex(self, element, coordinates):
-        """Add a new vertex into the route map with a pair of coordinates."""
+        """Add and return a new vertex into the route map.
+        
+        Args:
+            element (any): The data associated with the vertex.
+            coordinates (tuple): Pair of geographic coordinates of the vertex.
+        """
         vertex = super().add_vertex(element)
         self._coords[vertex] = coordinates
         return vertex
+
+    def remove_vertex(self, v):
+        """Remove vertex v and all incident edges on it.
+
+        Args:
+            v (Vertex): Vertex to be removed.
+        """
+        super().remove_vertex(v)
+        if v in self._coords:
+            del self._coords[v]
 
     def sp(self, v, w):
         """Get the shortest path from vertex v to w.
@@ -74,7 +89,7 @@ class RouteMap(Graph):
 
         Args:
             path (list): A list with the vertices on a path.
-            filename (str): Name of the output file
+            filename (str): Name of the output file.
         """
         filename += ".txt"
         with open(filename, "w") as file:
