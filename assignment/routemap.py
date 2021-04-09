@@ -9,7 +9,7 @@ class RouteMap(Graph):
 
     def __init__(self, filename=None):
         """Initialise a new RouteMap, optionally from a file.
-        
+
         Args:
             filename (str): Path to the file containing the graph.
                             (Default: None)
@@ -28,7 +28,7 @@ class RouteMap(Graph):
 
     def add_vertex(self, element, coordinates):
         """Add and return a new vertex into the route map.
-        
+
         Args:
             element (any): The data associated with the vertex.
             coordinates (tuple): Pair of geographic coordinates of the vertex.
@@ -154,7 +154,8 @@ def main():
     ids["gaol"] = 3777201945
     ids["mahonpoint"] = 330068634
 
-    paths = [("wgb", "neptune"), ("oldoak", "cuh"), ("gaol", "mahonpoint")]
+    paths = [("wgb", "neptune"), ("oldoak", "cuh"), ("gaol", "mahonpoint"),
+             ("mahonpoint", "wgb")]
 
     for path in paths:
         source = path[0]

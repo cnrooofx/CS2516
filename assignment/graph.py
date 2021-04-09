@@ -64,8 +64,8 @@ class Edge:
 
     def __str__(self):
         """Return a string representation of the edge."""
-        return "(E: {}; {} -- {})".format(self._element,
-            self._edge[0], self._edge[1])
+        return "(E: {}; {} -- {})".format(self._element, self._edge[0],
+                                          self._edge[1])
 
     def element(self):
         """Return the element associated with the edge."""
@@ -95,15 +95,18 @@ class Edge:
 class Graph:
     """Undirected Graph."""
 
-    def __init__(self):
-        """Initialise a new graph."""
+    def __init__(self, filename=None):
+        """Initialise a new graph, optionally from a file."""
         self._adj_map = {}
-        self._vertices = {}
+        self._vertices_lookup = {}
+
+        if filename:
+            self.read_graph(filename)
 
     def __str__(self):
         """Return a string representation of the graph."""
-        summary = "|V| = {}; |E| = {}".format(
-            self.num_vertices(), self.num_edges())
+        summary = "|V| = {}; |E| = {}".format(self.num_vertices(),
+                                              self.num_edges())
         vertex_str = "\n\nVertices: "
         for vertex in self._adj_map:
             vertex_str += str(vertex) + "-"
@@ -189,7 +192,7 @@ class Graph:
             element (Element): The element to search for.
         """
         try:
-            vertex = self._vertices[element]
+            vertex = self._vertices_lookup[element]
         except KeyError:
             vertex = None
         return vertex
@@ -202,7 +205,7 @@ class Graph:
         """
         vertex = Vertex(element)
         self._adj_map[vertex] = {}
-        self._vertices[element] = vertex
+        self._vertices_lookup[element] = vertex
         return vertex
 
     def add_vertex_if_new(self, element):
@@ -373,38 +376,54 @@ class Graph:
                             opened.update_key(element, new_cost)
         return closed
 
+    def read_graph(self, filename):
+        """Build a graph from the given file.
 
-def read_graph(filename):
-    graph = Graph()
-    with open(filename, "r") as file:
-        entry = file.readline()
-        count = 0
-        while entry == "Node\n":
-            count += 1
-            nodeid = int(file.readline().split()[1])
-            graph.add_vertex(nodeid)
+        Args:
+            filename (str): The path to the graph file.
+        """
+        start = time()
+        with open(filename, "r") as file:
             entry = file.readline()
-        verts = len(graph.vertices())
-        print("Read {} vertices and added {} into graph".format(count, verts))
-        count = 0
-        while entry == "Edge\n":
-            count += 1
-            source = int(file.readline().split()[1])
-            sv = graph.get_vertex_by_label(source)
-            target = int(file.readline().split()[1])
-            tv = graph.get_vertex_by_label(target)
-            length = float(file.readline().split()[1])
-            graph.add_edge(sv, tv, length)
-            file.readline()
-            entry = file.readline()
-        edges = len(graph.edges())
-        print("Read {} edges and added {} into graph".format(count, edges))
-    print(graph, "\n")
-    return graph
+            count = 0
+            while entry == "Node\n":
+                count += 1
+                nodeid = int(file.readline().split()[1])
+                self.add_vertex(nodeid)
+                entry = file.readline()
+            verts = self.num_vertices()
+            print("Read {} vertices, added {} into graph".format(count, verts))
+            count = 0
+            while entry == "Edge\n":
+                count += 1
+                source = int(file.readline().split()[1])
+                sv = self.get_vertex_by_label(source)
+                target = int(file.readline().split()[1])
+                tv = self.get_vertex_by_label(target)
+                length = float(file.readline().split()[1])
+                self.add_edge(sv, tv, length)
+                file.readline()
+                entry = file.readline()
+            edges = self.num_edges()
+            print("Read {} edges, added {} into graph".format(count, edges))
+        end = time()
+        total_time = round((end - start), 4)
+        print("Time to build graph {}s".format(total_time))
+        print("-" * 25, "\n")
 
 
 def test_shortest_paths(filename, start_vertex, end_vertex):
-    graph = read_graph(filename)
+    """Build a graph and get the shortest path between the given vertices.
+
+    Args:
+        filename (str): The name of the graph file.
+        start_vertex: The vertex to start the path from.
+        end_vertex: The vertex to end the path on.
+
+    Returns:
+        The cost to get to the end vertex and it's predecessor.
+    """
+    graph = Graph(filename)
     start_v = graph.get_vertex_by_label(start_vertex)
     end_v = graph.get_vertex_by_label(end_vertex)
     start = time()

@@ -1,5 +1,6 @@
 """Adaptable Priority Queue."""
 
+
 class Element:
     """An Element to store data with an associated key."""
 
@@ -91,7 +92,7 @@ class AdaptablePQ:
         key, value = removed_element._key, removed_element._value
         removed_element._wipe()
         return (key, value)
-    
+
     def remove_min(self):
         """Remove and return the highest priority item in the queue.
 
@@ -145,7 +146,7 @@ class AdaptablePQ:
         if left < self._size and self._heap[i] > self._heap[minchild]:
             self._swap(i, minchild)
             self._bubbledown(minchild)
-    
+
     def _swap(self, i, j):
         """Swap the two elements at the given indices."""
         self._heap[i], self._heap[j] = self._heap[j], self._heap[i]
@@ -160,9 +161,10 @@ class SearchableAPQ(AdaptablePQ):
     """
 
     def __init__(self):
+        """Initialise a new queue."""
         super().__init__()
         self._lookup = {}
-    
+
     def search(self, item):
         """Get the reference to the item in the queue."""
         try:
@@ -170,7 +172,7 @@ class SearchableAPQ(AdaptablePQ):
         except KeyError:
             element = None
         return element
-    
+
     def add(self, key, value):
         """Add an item to the queue with the specified priority.
 
@@ -178,7 +180,7 @@ class SearchableAPQ(AdaptablePQ):
             A reference to the item within the queue.
         """
         element = super().add(key, value)
-        self._lookup[item] = element
+        self._lookup[value] = element
         return element
 
     def remove(self, element):
