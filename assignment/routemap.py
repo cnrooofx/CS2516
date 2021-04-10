@@ -1,6 +1,7 @@
 """Route Map Graph."""
 
 from time import time
+from math import sqrt
 from graph import Graph
 
 
@@ -46,6 +47,30 @@ class RouteMap(Graph):
         super().remove_vertex(v)
         if v in self._coords:
             del self._coords[v]
+
+    def get_coordinates(self, v):
+        """Return the coordinates of the vertex or None if not in the graph.
+
+        Args:
+            v (Vertex): Vertex to get the coordinates of.
+        """
+        try:
+            coordinates = self._coords[v]
+        except KeyError:
+            coordinates = None
+        return coordinates
+
+    def distance(self, c1, c2):
+        """Return the distance between coordinates c1 and c2.
+
+        Args:
+            c1 (tuple): First coordinate pair.
+            c2 (tuple): Second coordinate pair.
+        """
+        lat1, lon1 = c1[0], c1[1]
+        lat2, lon2 = c2[0], c2[1]
+        distance = sqrt(((lat2-lat1) ** 2) + ((lon2-lon1) ** 2))
+        return distance
 
     def sp(self, v, w):
         """Get the shortest path from vertex v to w.
