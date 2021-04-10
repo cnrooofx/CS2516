@@ -72,6 +72,22 @@ class RouteMap(Graph):
         distance = sqrt(((lat2-lat1) ** 2) + ((lon2-lon1) ** 2))
         return distance
 
+    def get_vertex_by_coordinates(self, coordinates):
+        """Return the closest vertex to a set of coordinates.
+
+        Args:
+            coordinates (tuple): Pair of coordinates to search for.
+        """
+        min_distance = None
+        closest_vertex = None
+        for vertex in self._coords:
+            coords_to_compare = self._coords[vertex]
+            distance = self.distance(coordinates, coords_to_compare)
+            if min_distance is None or distance < min_distance:
+                min_distance = distance
+                closest_vertex = vertex
+        return closest_vertex
+
     def sp(self, v, w):
         """Get the shortest path from vertex v to w.
 
@@ -179,8 +195,13 @@ def main():
     ids["gaol"] = 3777201945
     ids["mahonpoint"] = 330068634
 
+    train = routemap.get_vertex_by_coordinates((51.902190, -8.458052))
+    ids["train"] = train.element()
+    bus = routemap.get_vertex_by_coordinates((51.899871, -8.466624))
+    ids["bus"] = bus.element()
+
     paths = [("wgb", "neptune"), ("oldoak", "cuh"), ("gaol", "mahonpoint"),
-             ("mahonpoint", "wgb")]
+             ("mahonpoint", "wgb"), ("train", "turnerscross"), ("bus", "wgb")]
 
     for path in paths:
         source = path[0]
