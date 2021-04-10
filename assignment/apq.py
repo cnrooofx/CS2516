@@ -43,7 +43,7 @@ class AdaptablePQ:
         self._heap = []
         self._size = 0
 
-    def length(self):
+    def __len__(self):
         """Return the length of the queue."""
         return self._size
 
@@ -115,7 +115,11 @@ class AdaptablePQ:
         return element._key
 
     def update_key(self, element, newkey):
-        """Update the key of the element."""
+        """Update the key of the element.
+
+        Args:
+            element (Element): The element to update key
+        """
         if element._key is not None and element._value is not None:
             element._key = newkey
             index = element._index
@@ -157,7 +161,7 @@ class AdaptablePQ:
 class SearchableAPQ(AdaptablePQ):
     """Searchable Adaptable Priority Queue.
 
-    Has a lookup structure for getting references to items within the queue.
+    Has lookup function for getting references to items within the queue.
     """
 
     def __init__(self):
@@ -165,7 +169,11 @@ class SearchableAPQ(AdaptablePQ):
         super().__init__()
         self._lookup = {}
 
-    def search(self, item):
+    def __contains__(self, item):
+        """Return True if item is in the queue, otherwise False."""
+        return item in self._lookup
+
+    def __getitem__(self, item):
         """Get the reference to the item in the queue."""
         try:
             element = self._lookup[item]

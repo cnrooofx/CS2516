@@ -1,6 +1,6 @@
 """Undirected Graph ADT."""
 
-from apq import AdaptablePQ
+from apq import SearchableAPQ
 from time import time
 
 
@@ -96,10 +96,14 @@ class Graph:
     """Undirected Graph."""
 
     def __init__(self, filename=None):
-        """Initialise a new graph, optionally from a file."""
+        """Initialise a new graph, optionally from a file.
+
+        Args:
+            filename (str): Path to the file containing the graph.
+                            (Default: None)
+        """
         self._adj_map = {}
         self._vertices_lookup = {}
-
         if filename:
             self.read_graph(filename)
 
@@ -258,24 +262,24 @@ class Graph:
         del self._adj_map[v1][v2]
         del self._adj_map[v2][v1]
 
-    def depthfirstsearch(self, v):
+    def depth_first_search(self, v):
         """Return a dictionary of the depth-first search from v.
 
         Args:
             v (Vertex): The vertex to start searching from.
         """
         dfs = {v: None}
-        self._depthfirstsearch(v, dfs)
+        self._depth_first_search(v, dfs)
         return dfs
 
-    def _depthfirstsearch(self, v, marked):
+    def _depth_first_search(self, v, marked):
         for edge in self.get_edges(v):
             opposite = edge.opposite(v)
             if opposite not in marked:
                 marked[opposite] = edge
-                self._depthfirstsearch(opposite, marked)
+                self._depth_first_search(opposite, marked)
 
-    def breadthfirstsearch(self, v):
+    def breadth_first_search(self, v):
         """Return a dictionary of the breadth-first search from v.
 
         Args:
@@ -284,10 +288,10 @@ class Graph:
         bfs = {v: (None, 0)}
         layer = [v]
         i = 1
-        self._breadthfirstsearch(i, layer, bfs)
+        self._breadth_first_search(i, layer, bfs)
         return bfs
 
-    def _breadthfirstsearch(self, i, layer, marked):
+    def _breadth_first_search(self, i, layer, marked):
         next_layer = []
         for vertex in layer:
             for edge in self.get_edges(vertex):
@@ -297,7 +301,7 @@ class Graph:
                     next_layer.append(opposite)
         if len(next_layer) > 0:
             i += 1
-            self._breadthfirstsearch(i, next_layer, marked)
+            self._breadth_first_search(i, next_layer, marked)
 
     def max_distance(self, bfs):
         """Return the max distance to a vertex from a breadth-first search.
@@ -313,7 +317,11 @@ class Graph:
         return max_distance
 
     def print_distances(self, bfs):
-        """Print the paths and distances given a breadth-first search tree."""
+        """Print the paths and distances given a breadth-first search tree.
+        
+        Args:
+            bfs (dict): The result of a breadth-first search from a vertex.
+        """
         for vertex in bfs:
             edge, distance = bfs[vertex]
             print("V: {}, E: {}, Distance: {}".format(vertex, edge, distance))
@@ -325,7 +333,7 @@ class Graph:
         vertices = self.vertices()
         if len(vertices) > 0:
             for vertex in vertices:
-                bfs = self.breadthfirstsearch(vertex)
+                bfs = self.breadth_first_search(vertex)
                 max_distance = self.max_distance(bfs)
                 if not min_distance or max_distance < min_distance:
                     min_distance = max_distance
@@ -339,34 +347,30 @@ class Graph:
             v (Vertex): Start vertex to find paths from.
 
         Returns:
-            A dictionary with vertices as keys and (cost, predecessor)
-            pairs as values.
+            A dictionary with vertices as keys and (cost, predecessor) pairs
+            as values.
         """
-        opened = AdaptablePQ()
-        locations = {}
+        opened = SearchableAPQ()
         closed = {}
         predecessors = {v: None}
 
-        start_element = opened.add(0, v)
-        locations[v] = start_element
+        opened.add(0, v)
         while opened.length() > 0:
             cost, vertex = opened.remove_min()
             predecessor = predecessors.pop(vertex)
-            del locations[vertex]
 
             closed[vertex] = (cost, predecessor)
             for edge in self.get_edges(vertex):
                 opposite_vertex = edge.opposite(vertex)
                 if opposite_vertex not in closed:
                     new_cost = cost + edge.element()
-                    if opposite_vertex not in locations:
+                    if opposite_vertex not in opened:
                         # Set the current vertex's predecessor
                         predecessors[opposite_vertex] = vertex
                         # Add the current vertex to opened with it's cost
-                        element = opened.add(new_cost, opposite_vertex)
-                        locations[opposite_vertex] = element
+                        opened.add(new_cost, opposite_vertex)
                     else:
-                        element = locations[opposite_vertex]
+                        element = opened[opposite_vertex]
                         old_cost = opened.get_key(element)
                         # If the new cost is better than the old cost
                         if new_cost < old_cost:

@@ -17,7 +17,6 @@ class RouteMap(Graph):
         """
         super().__init__()
         self._coords = {}
-
         if filename:
             self.read_route_graph(filename)
 
