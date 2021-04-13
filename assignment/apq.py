@@ -86,11 +86,13 @@ class AdaptablePQ:
         Returns:
             The (key, value) pair from the element.
         """
-        index = element._index
-        if index >= self._size or self._heap[index] is not element:
+        if element._key is None and element._value is None:
             return None
-        # Swap the element with the last item in the queue
-        self._swap(index, self._size - 1)
+        index = element._index
+        last_index = self._size - 1
+        if index != last_index:
+            # Swap the element with the last item in the queue
+            self._swap(index, last_index)
         # Remove the last item (now the required element) and update size
         removed_element = self._heap.pop()
         self._size -= 1
@@ -129,16 +131,16 @@ class AdaptablePQ:
         """
         if element._key is not None and element._value is not None:
             element._key = newkey
-            index = element._index
-            self._rebalance(index)
+            self._rebalance(element._index)
 
     def _rebalance(self, i):
         """Rebalance the item at index to the correct position."""
-        parent = (i - 1) // 2
-        if parent >= 0 and self._heap[i] < self._heap[parent]:
-            self._bubbleup(i)
-        else:
-            self._bubbledown(i)
+        if i < self._size:
+            parent = (i - 1) // 2
+            if parent >= 0 and self._heap[i] < self._heap[parent]:
+                self._bubbleup(i)
+            else:
+                self._bubbledown(i)
 
     def _bubbleup(self, i):
         """Bubble item at index up to its correct position in the heap."""
@@ -208,5 +210,6 @@ class SearchableAPQ(AdaptablePQ):
             The (key, value) pair from the element.
         """
         removed = super().remove(element)
-        del self._lookup[removed[1]]
+        if removed is not None:
+            del self._lookup[removed[1]]
         return removed
