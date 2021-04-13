@@ -18,15 +18,21 @@ class Element:
 
     def __eq__(self, other):
         """Return True if this key is equal to the other, otherwise False."""
-        return self._key == other._key
+        if isinstance(other, Element):
+            return self._key == other._key
+        return self._key == other
 
     def __lt__(self, other):
         """Return True if this key is less than the other, otherwise False."""
-        return self._key < other._key
+        if isinstance(other, Element):
+            return self._key < other._key
+        return self._key < other
 
     def __gt__(self, other):
         """Return True if this key is greater than other, otherwise False."""
-        return self._key > other._key
+        if isinstance(other, Element):
+            return self._key > other._key
+        return self._key > other
 
     def _wipe(self):
         """Clear all of the data in the element."""
@@ -61,11 +67,12 @@ class AdaptablePQ:
         return element
 
     def get_min(self):
-        """Return the highest priority item in the queue.
+        """Return the highest priority item in the queue."""
+        element = self._get_min_element()
+        if element is not None:
+            return (element._key, element._value)
 
-        Returns:
-            The element with the smallest key value.
-        """
+    def _get_min_element(self):
         if self._size == 0:
             return None
         return self._heap[0]
@@ -99,9 +106,9 @@ class AdaptablePQ:
         Returns:
             The (key, value) pair of the highest priority item.
         """
-        min_value = self.get_min()
-        if min_value is not None:
-            return self.remove(min_value)
+        min_element = self._get_min_element()
+        if min_element is not None:
+            return self.remove(min_element)
 
     def get_key(self, element):
         """Return the current key for element.
