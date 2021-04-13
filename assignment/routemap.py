@@ -82,7 +82,7 @@ class RouteMap(Graph):
         for vertex in self._coords:
             coords_to_compare = self._coords[vertex]
             distance = self.distance(coordinates, coords_to_compare)
-            if min_distance is None or distance < min_distance:
+            if not min_distance or distance < min_distance:
                 min_distance = distance
                 closest_vertex = vertex
         return closest_vertex

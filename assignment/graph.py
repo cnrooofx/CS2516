@@ -218,9 +218,8 @@ class Graph:
         Args:
             element (any): The data associated with the vertex.
         """
-        for vertex in self._adj_map:
-            if vertex.element() == element:
-                return vertex
+        if element in self._vertices_lookup:
+            return self._vertices_lookup[element]
         return self.add_vertex(element)
 
     def add_edge(self, v1, v2, element):
@@ -318,7 +317,7 @@ class Graph:
 
     def print_distances(self, bfs):
         """Print the paths and distances given a breadth-first search tree.
-        
+
         Args:
             bfs (dict): The result of a breadth-first search from a vertex.
         """
@@ -355,7 +354,7 @@ class Graph:
         predecessors = {v: None}
 
         opened.add(0, v)
-        while opened.length() > 0:
+        while len(opened) > 0:
             cost, vertex = opened.remove_min()
             predecessor = predecessors.pop(vertex)
 
